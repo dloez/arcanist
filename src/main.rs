@@ -3,9 +3,9 @@ use glob::glob;
 use std::path::PathBuf;
 use strum::IntoEnumIterator;
 use strum_macros::EnumIter;
-use wrapper::WrapperActions;
 
 mod wrapper;
+use wrapper::WrapperActions;
 
 #[derive(EnumIter)]
 enum SupportedExtension {
@@ -74,7 +74,7 @@ fn main() {
     let matches = Command::new("Arcanist")
         .version("0.1")
         .author("David L. <davidlopez.hellin@outlook.com>")
-        .about("A 'Mage' like inspired function runner with multi-language support")
+        .about("A 'Mage' inspired function runner with multi-language support")
         .arg(arg!([function_name] "Function to call").required(true))
         .get_matches();
 
@@ -83,6 +83,8 @@ fn main() {
         .get_one::<String>("function_name")
         .expect("required");
     for wrapper in wrappers {
-        println!("{:?}", wrapper.does_function_exists(function_name));
+        if wrapper.does_function_exists(function_name) {
+            wrapper.call_function(function_name);
+        };
     }
 }

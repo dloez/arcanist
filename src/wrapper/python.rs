@@ -1,4 +1,8 @@
-use std::{fs, path::PathBuf};
+use duct::cmd;
+use std::fs;
+use std::io::BufRead;
+use std::io::BufReader;
+use std::path::PathBuf;
 
 use regex::Regex;
 
@@ -11,4 +15,34 @@ pub fn does_function_exists(spec_file_path: &PathBuf, function_name: &str) -> bo
     let regex_pattern = &REGEX_FUNCTION_PATTERN.replace("{{function_name}}", function_name);
     let regex = Regex::new(&regex_pattern).expect("Failed to define regex");
     regex.is_match(&file_content)
+}
+
+pub fn call_function(spec_file_path: &PathBuf, function_name: &str) {
+    let python_code = "\
+        import importlib.util; \
+        spec = importlib.util.spec_from_file_location('main', '{{spec_file_path}}'); \
+        module = importlib.util.module_from_spec(spec); \
+        spec.loader.exec_module(module); \
+        module.{{function_name}}() \
+    ";
+    let python_code = python_code
+        .replace(
+            "{{spec_file_path}}",
+            spec_file_path
+                .to_str()
+                .expect("Could not get str from pathbuf"),
+        )
+        .replace("{{function_name}}", function_name);
+
+    let shell_cmd = cmd!("python", "-c", python_code);
+    let reader = shell_cmd
+        .stderr_to_stdout()
+        .stderr_capture()
+        .reader()
+        .expect("failed to redirect stderr to stdout");
+
+    let lines = BufReader::new(reader).lines();
+    for line in lines {
+        println!("{}", line.unwrap());
+    }
 }
