@@ -1,3 +1,4 @@
+use clap::{arg, Command};
 use glob::glob;
 use std::path::PathBuf;
 use strum::IntoEnumIterator;
@@ -70,9 +71,18 @@ fn get_spec_files_paths() -> Vec<wrapper::Wrapper> {
 }
 
 fn main() {
-    let wrappers = get_spec_files_paths();
+    let matches = Command::new("Arcanist")
+        .version("0.1")
+        .author("David L. <davidlopez.hellin@outlook.com>")
+        .about("A 'Mage' like inspired function runner with multi-language support")
+        .arg(arg!([function_name] "Function to call").required(true))
+        .get_matches();
 
+    let wrappers = get_spec_files_paths();
+    let function_name = matches
+        .get_one::<String>("function_name")
+        .expect("required");
     for wrapper in wrappers {
-        println!("{:?}", wrapper.does_function_exists("example_2"));
+        println!("{:?}", wrapper.does_function_exists(function_name));
     }
 }
