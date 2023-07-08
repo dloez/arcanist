@@ -39,9 +39,7 @@ jobs:
           toolchain: 1.70.0
           targets: ${{ matrix.target }}
       - name: Run cargo check
-        uses: actions-rs/cargo@v1
-        with:
-          command: build --release --target ${{ matrix.target }}
+        run: cargo build --release --target ${{ matrix.target }}
   lint:
     runs-on: ubuntu-latest
     steps:
@@ -51,7 +49,5 @@ jobs:
         with:
           toolchain: 1.70.0
           components: clippy
-      - name: Run cargo check
-        uses: actions-rs/cargo@v1
-        with:
-          command: clippy
+      - name: Run clippy
+        run: cargo clippy
