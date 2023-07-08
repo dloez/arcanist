@@ -12,16 +12,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        target: 
-          - aarch64-unknown-linux-gnu
-          - x86_64-apple-darwin
-          - x86_64-unknown-linux-gnu
-          - x86_64-pc-windows-msvc
-        os:
-          - ubuntu-latest
-          - windows-latest
-          - macos-latest
-        include:
+        os-target:
           - os: ubuntu-latest
             target: x86_64-unknown-linux-gnu
           - os: ubuntu-latest
@@ -30,16 +21,19 @@ jobs:
             target: x86_64-pc-windows-msvc
           - os: macos-latest
             target: x86_64-apple-darwin
-    runs-on: ${{ matrix.os }}
+    runs-on: ${{ matrix.os-target.os }}
     steps:
       - uses: actions/checkout@v3
       - name: Setup rust toolchain
         uses: dtolnay/rust-toolchain@stable
         with:
           toolchain: 1.70.0
-          targets: ${{ matrix.target }}
+          targets: ${{ matrix.os-target.target }}
+      - name: Install aarch64-unknown-linux-gnu requisites
+        run: sudo apt-get install g++-aarch64-linux-gnu -y
+        if: matrix.os-target.target == 'aarch64-unknown-linux-gnu'
       - name: Run cargo check
-        run: cargo build --release --target ${{ matrix.target }}
+        run: cargo build --release --target ${{ matrix.os-target.target }}
   lint:
     runs-on: ubuntu-latest
     steps:
