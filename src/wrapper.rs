@@ -1,4 +1,4 @@
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 
 mod python;
 mod yaml;
@@ -14,19 +14,19 @@ pub enum WrapperKind {
 }
 
 trait WrapperKindActions {
-    fn does_function_exists(&self, spec_file_path: &PathBuf, function_name: &str) -> bool;
-    fn call_function(&self, spec_file_path: &PathBuf, function_name: &str);
+    fn does_function_exists(&self, spec_file_path: &Path, function_name: &str) -> bool;
+    fn call_function(&self, spec_file_path: &Path, function_name: &str);
 }
 
 impl WrapperKindActions for WrapperKind {
-    fn does_function_exists(&self, spec_file_path: &PathBuf, function_name: &str) -> bool {
+    fn does_function_exists(&self, spec_file_path: &Path, function_name: &str) -> bool {
         match self {
             WrapperKind::Yaml => todo!(),
             WrapperKind::Python => python::does_function_exists(spec_file_path, function_name),
         }
     }
 
-    fn call_function(&self, spec_file_path: &PathBuf, function_name: &str) {
+    fn call_function(&self, spec_file_path: &Path, function_name: &str) {
         match self {
             WrapperKind::Yaml => todo!(),
             WrapperKind::Python => python::call_function(spec_file_path, function_name),
