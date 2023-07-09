@@ -18,10 +18,11 @@ jobs:
           git fetch origin &> /dev/null
           version=${{ steps.gather-version.outputs.version }}
           if [[ -n "$(git tag -l v${version})" ]]; then
-            echo "A release '${version}' already exists." >&2
-            exit 1
+            echo "Project version '${version}' and tag 'v${version}' matches!!"
+            exit 0
           else
-            echo "Tag 'v${version}' will be created"
+            echo "Project version '${version}' and tag 'v${version}' does not match!!"
+            exit 1
           fi
   build-lint:
     uses: ./.github/workflows/build_lint.yml
