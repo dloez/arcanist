@@ -9,6 +9,7 @@ jobs:
       version: ${{ steps.gather-version.outputs.version }}
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v3
       - name: Extract version from Cargo.toml
         id: gather-version
         run: echo version=$(cargo metadata --format-version 1 | jq -r '.packages[] | select(.name == "arcanist").version') >> $GITHUB_OUTPUT
