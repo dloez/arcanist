@@ -1,15 +1,20 @@
-name: Build and lint
+name: Create release on
 on:
   push:
-    branches:
-      - main
-  pull_request:
-    branches:
-      - main
+    tags:
+      - "v*.*.*"
 jobs:
+  setup:
+    outputs:
+      version: ${{ steps.gather-version.outputs.version }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Extract version from Cargo.toml
+        id: gather-version
+        run: echo version=$(cargo metadata --format-version 1 | jq -r '.packages[] | select(.name == "arcanist").version') >> $GITHUB_OUTPUT
   build:
+    needs: setup
     strategy:
-      fail-fast: false
       matrix:
         os-target:
           - os: ubuntu-latest
@@ -34,17 +39,8 @@ jobs:
         if: matrix.os-target.target == 'aarch64-unknown-linux-gnu'
       - name: Run cargo check
         run: cargo build --release --target ${{ matrix.os-target.target }}
-  lint:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - name: Setup rust toolchain
-        uses: dtolnay/rust-toolchain@stable
+      - name: Upload artifacts for reuse in release job
+        uses: actions/upload-artifact@v3
         with:
-          toolchain: 1.70.0
-          components: clippy,rustfmt
-      - uses: Swatinem/rust-cache@v2
-      - name: Run clippy
-        run: cargo clippy -- -D warnings
-      - name: Run rustfmt
-        run: cargo fmt --all -- --check
+          name: arcanist_${{ needs.setup.outputs.version }}_${{ matrix.os-target.target }}
+          path: target/${{ matrix.os-target.target }}/arcanist*
