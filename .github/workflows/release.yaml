@@ -94,11 +94,12 @@ jobs:
       - uses: actions/checkout@v3
       - uses: actions/download-artifact@v3
         with:
+          name: arcanist_${{ needs.setup.outputs.version }}_${{ matrix.target }}
           path: ${{ github.workspace }}/target/${{ matrix.target }}/release/arcanist${{ matrix.target == 'x86_64-pc-windows-msvc' && '.exe' || '' }}
       - name: Upload arcanist binary to release
         run: |
           gh release upload v${{ needs.setup.outputs.version }} \
-          ${{ github.workspace }}/target/${{ matrix.target }}/release/arcanist/arcanist${{ matrix.target == 'x86_64-pc-windows-msvc' && '.exe' || '' }}#\
+          ${{ github.workspace }}/target/${{ matrix.target }}/release/arcanist${{ matrix.target == 'x86_64-pc-windows-msvc' && '.exe' || '' }}#\
           arcanist_${{ needs.setup.outputs.version }}_${{ matrix.target }}${{ matrix.target == 'x86_64-pc-windows-msvc' && '.exe' || '' }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
