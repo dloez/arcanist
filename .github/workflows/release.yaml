@@ -88,7 +88,7 @@ jobs:
         target:
           - x86_64-unknown-linux-gnu
           - aarch64-unknown-linux-gnu
-          # - x86_64-pc-windows-msvc
+          - x86_64-pc-windows-msvc
           - x86_64-apple-darwin
     runs-on: ubuntu-latest
     steps:
@@ -96,10 +96,10 @@ jobs:
       - uses: actions/download-artifact@v3
         with:
           name: arcanist_${{ needs.setup.outputs.version }}_${{ matrix.target }}
-          path: ${{ github.workspace }}/target/${{ matrix.target }}/release/arcanist${{ matrix.target == 'x86_64-pc-windows-msvc' && '.exe' || '' }}
+          path: ${{ github.workspace }}/target/${{ matrix.target }}/release
       - name: Upload arcanist binary to release
         run: |
-          mv ${{ github.workspace }}/target/${{ matrix.target }}/release/arcanist/arcanist${{ matrix.target == 'x86_64-pc-windows-msvc' && '.exe' || '' }} \
+          mv ${{ github.workspace }}/target/${{ matrix.target }}/release/arcanist${{ matrix.target == 'x86_64-pc-windows-msvc' && '.exe' || '' }} \
           arcanist_${{ needs.setup.outputs.version }}_${{ matrix.target }}${{ matrix.target == 'x86_64-pc-windows-msvc' && '.exe' || '' }}
           gh release upload v${{ needs.setup.outputs.version }} \
           arcanist_${{ needs.setup.outputs.version }}_${{ matrix.target }}${{ matrix.target == 'x86_64-pc-windows-msvc' && '.exe' || '' }}
