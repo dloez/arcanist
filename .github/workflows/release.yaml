@@ -1,8 +1,8 @@
 name: Create release
 on:
-  pull_request:
-    branches:
-      - main
+  push:
+    tags:
+      - "v*.*.*"
 jobs:
   setup:
     outputs:
@@ -79,6 +79,7 @@ jobs:
           tag_name: v${{ needs.setup.outputs.version }}
           body_path: ${{ github.workspace }}/.github/release_notes.txt
           target_commitish: ${{ github.base_ref }}
+          prerelease: true
   upload-to-release:
     needs: [setup, build, create-release]
     permissions:
