@@ -43,4 +43,5 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: arcanist_${{ needs.setup.outputs.version }}_${{ matrix.os-target.target }}
-          path: target/${{ matrix.os-target.target }}/arcanist*
+          path: target/${{ matrix.os-target.target }}/arcanist
+          if-no-files-found: error
