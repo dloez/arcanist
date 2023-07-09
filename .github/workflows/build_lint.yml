@@ -6,10 +6,21 @@ on:
   pull_request:
     branches:
       - main
+  workflow_call:
+    inputs:
+      for_release:
+        type: boolean
+        description: |
+          Mark if additional steps required for a release, like uploading artifacts, should be executed
+        required: true
+        default: false
+      version:
+        type: string
+        description: Project version used for naming artifacts
+        required: true
 jobs:
   build:
     strategy:
-      fail-fast: false
       matrix:
         os-target:
           - os: ubuntu-latest
@@ -34,6 +45,14 @@ jobs:
         if: matrix.os-target.target == 'aarch64-unknown-linux-gnu'
       - name: Run cargo check
         run: cargo build --release --target ${{ matrix.os-target.target }}
+      - name: Upload artifacts for reuse in release job
+        uses: actions/upload-artifact@v3
+        if: ${{ inputs.for_release }}
+        with:
+          name: arcanist_${{ inputs.version }}_${{ matrix.os-target.target }}
+          path: ${{ github.workspace }}/target/${{ matrix.os-target.target }}/release/arcanist${{ matrix.os-target.target == 'x86_64-pc-windows-msvc' && '.exe' || '' }}
+          if-no-files-found: error
+          retention-days: 5
   lint:
     runs-on: ubuntu-latest
     steps:
