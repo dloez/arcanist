@@ -56,6 +56,7 @@ jobs:
           name: arcanist_${{ needs.setup.outputs.version }}_${{ matrix.os-target.target }}
           path: ${{ github.workspace }}/target/${{ matrix.os-target.target }}/release/arcanist${{ matrix.os-target.target == 'x86_64-pc-windows-msvc' && '.exe' || '' }}
           if-no-files-found: error
+          retention-days: 5
   create-release:
     needs: [setup, build]
     runs-on: ubuntu-latest
@@ -87,7 +88,7 @@ jobs:
         target:
           - x86_64-unknown-linux-gnu
           - aarch64-unknown-linux-gnu
-          - x86_64-pc-windows-msvc
+          # - x86_64-pc-windows-msvc
           - x86_64-apple-darwin
     runs-on: ubuntu-latest
     steps:
