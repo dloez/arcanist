@@ -12,7 +12,7 @@ Requisites:
 1. Run `curl https://raw.githubusercontent.com/dloez/arcanist/main/install.sh | sh`.
 
 ## Manual install
-Use this method if your OS is currently not available in the [automatic installation](https://github.com/dloez/arcanist/blob/main/INSTALL.md#Automatic-installation).
+Use this method if your OS is currently not available in the [automatic installation](https://github.com/dloez/arcanist/blob/main/INSTALL.md#automatic-installation).
 
 1. Download your platform binary from the [release page](https://github.com/dloez/arcanist/releases/tag/v0.1.0).
 2. Place the binary in a directory that is on the system `PATH` or add the directory to the `PATH`.

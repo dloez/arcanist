@@ -29,7 +29,7 @@ If a function is defined multiple times the function will be called multiple tim
 Refer for the `Installation` section of the release you want to install. To install the latest version, visit the [latest installation instructions](https://github.com/dloez/arcanist/blob/main/INSTALL.md).
 
 ## Supported platforms
-This is the current list of platforms which have pre-built binaries. If your platform is missing, open a new issue and/or visit the [installing from source section from the latest installation instructions](https://github.com/dloez/arcanist/blob/main/INSTALL.md).
+This is the current list of platforms which have pre-built binaries. If your platform is missing, open a new issue and/or visit the [installing from source section from the latest installation instructions](https://github.com/dloez/arcanist/blob/main/INSTALL.md#installing-from-source).
 
 - Linux (x32-x64-aarch64)
 - macOS (x64)
