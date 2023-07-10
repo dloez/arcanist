@@ -59,30 +59,32 @@ remove_old_installation() {
     rm -rf "$HOME/.arcanist"
 
     if [ -e "$HOME/.bashrc" ]; then
-        sed -ie "s#$PROFILE_MOD_EXPORT##g" "$HOME/.bashrc"
-        sed -i "s#$PROFILE_MOD_SOURCE##g" "$HOME/.bashrc"
+        sed -i "/$(echo "$PROFILE_MOD_EXPORT" | sed 's/[\/&]/\\&/g')/d" "$HOME/.bashrc"
+        sed -i "/$(echo "$PROFILE_MOD_SOURCE" | sed 's/[\/&]/\\&/g')/d" "$HOME/.bashrc"
     fi
 
     if [ -e "$HOME/.zshrc" ]; then
-        sed -ie "s#$PROFILE_MOD_EXPORT##g" "$HOME/.zshrc"
-        sed -ie "s#$PROFILE_MOD_SOURCE##g" "$HOME/.zshrc"
+        sed -i "/$(echo "$PROFILE_MOD_EXPORT" | sed 's/[\/&]/\\&/g')/d" "$HOME/.zshrc"
+        sed -i "/$(echo "$PROFILE_MOD_SOURCE" | sed 's/[\/&]/\\&/g')/d" "$HOME/.zshrc"
     fi
 
     if [ -e "$HOME/.fishrc" ]; then
-        sed -ie "s#$PROFILE_MOD_EXPORT##g" "$HOME/.fishrc"
-        sed -ie "s#$PROFILE_MOD_SOURCE##g" "$HOME/.fishrc"
+        sed -i "/$(echo "$PROFILE_MOD_EXPORT" | sed 's/[\/&]/\\&/g')/d" "$HOME/.fishrc"
+        sed -i "/$(echo "$PROFILE_MOD_SOURCE" | sed 's/[\/&]/\\&/g')/d" "$HOME/.fishrc"
     fi
 }
 
 install_arcanist() {
     mkdir -p "$HOME/.arcanist/bin"
     binary="arcanist_${VERSION}_${architecture}-${platform}"
-    download_output=$(wget "${GITHUB_RELEASE_DOWNLOAD_URL}/${binary}" -O "$HOME/.arcanist/bin/arcanist")
+    echo "Downloaidng version ${VERSION}..."
+    download_output=$(wget "${GITHUB_RELEASE_DOWNLOAD_URL}/${binary}" -O "$HOME/.arcanist/bin/arcanist" >/dev/null 2>&1)
     
     if [ $? -gt 0 ]; then
         exit $?
     fi
 
+    echo "Installing arcanist at '$HOME/.arcanist/bin/arcanist'"
     chmod +x "$HOME/.arcanist/bin/arcanist"
     echo "$ARCANIST_SH" > "$HOME/.arcanist/arcanist.sh"
 
@@ -140,4 +142,7 @@ fi
 install_arcanist
 if [ $? -gt 0 ]; then
     echo "Failed to install arcanist"
+    exit 1
 fi
+
+echo "Done! To start using arcanist close this shell and open a new one or run 'source "$HOME/.arcanist/arcanist.sh"'"
