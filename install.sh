@@ -54,6 +54,54 @@ print_system_information() {
     echo "CPU architecture: $(uname -m)"
 }
 
+remove_old_installation() {
+    echo "Removing old installation..."
+    rm -rf "$HOME/.arcanist"
+
+    if [ -e "$HOME/.bashrc" ]; then
+        sed -ie "s#$PROFILE_MOD_EXPORT##g" "$HOME/.bashrc"
+        sed -i "s#$PROFILE_MOD_SOURCE##g" "$HOME/.bashrc"
+    fi
+
+    if [ -e "$HOME/.zshrc" ]; then
+        sed -ie "s#$PROFILE_MOD_EXPORT##g" "$HOME/.zshrc"
+        sed -ie "s#$PROFILE_MOD_SOURCE##g" "$HOME/.zshrc"
+    fi
+
+    if [ -e "$HOME/.fishrc" ]; then
+        sed -ie "s#$PROFILE_MOD_EXPORT##g" "$HOME/.fishrc"
+        sed -ie "s#$PROFILE_MOD_SOURCE##g" "$HOME/.fishrc"
+    fi
+}
+
+install_arcanist() {
+    mkdir -p "$HOME/.arcanist/bin"
+    binary="arcanist_${VERSION}_${architecture}-${platform}"
+    download_output=$(wget "${GITHUB_RELEASE_DOWNLOAD_URL}/${binary}" -O "$HOME/.arcanist/bin/arcanist")
+    
+    if [ $? -gt 0 ]; then
+        exit $?
+    fi
+
+    chmod +x "$HOME/.arcanist/bin/arcanist"
+    echo "$ARCANIST_SH" > "$HOME/.arcanist/arcanist.sh"
+
+    if [ -e "$HOME/.bashrc" ]; then
+        echo "$PROFILE_MOD_EXPORT" >> "$HOME/.bashrc"
+        echo "$PROFILE_MOD_SOURCE" >> "$HOME/.bashrc"
+    fi
+
+    if [ -e "$HOME/.zshrc" ]; then
+        echo "$PROFILE_MOD_EXPORT" >> "$HOME/.zshrc"
+        echo "$PROFILE_MOD_SOURCE" >> "$HOME/.zshrc"
+    fi
+
+    if [ -e "$HOME/.fishrc" ]; then
+        echo "$PROFILE_MOD_EXPORT" >> "$HOME/.fishrc"
+        echo "$PROFILE_MOD_SOURCE" >> "$HOME/.fishrc"
+    fi
+}
+
 
 VERSION="0.1.0"
 GITHUB_REPOSITORY_BASE_URL="https://github.com/dloez"
@@ -61,6 +109,11 @@ GITHUB_RELEASES_BASE_URL="${GITHUB_REPOSITORY_BASE_URL}/arcanist/releases"
 GITHUB_RELEASE_URL="${GITHUB_RELEASES_BASE_URL}/tag/${VERSION}"
 GITHUB_RELEASE_DOWNLOAD_URL="${GITHUB_RELEASES_BASE_URL}/download/v${VERSION}"
 GITHUB_ISSUES_NEW_URL="${GITHUB_REPOSITORY_BASE_URL}/issues/new"
+
+PROFILE_MOD_EXPORT='export ARCANIST_DIR="$HOME/.arcanist"'
+PROFILE_MOD_SOURCE='[ -s "$HOME/.arcanist/arcanist.sh" ] && source "$HOME/.arcanist/arcanist.sh"'
+
+ARCANIST_SH='export PATH=$PATH:$HOME/.arcanist/bin'
 
 environment=$(environment_validation)
 case $? in
@@ -80,6 +133,11 @@ esac
 platform=$(echo $environment | cut -d : -f 1)
 architecture=$(echo $environment | cut -d : -f 2)
 
-binary="arcanist_${VERSION}_${architecture}-${platform}"
-echo $binary
-wget "${GITHUB_RELEASE_DOWNLOAD_URL}/${binary}"
+if [ -e "$HOME/.arcanist" ]; then
+    remove_old_installation
+fi
+
+install_arcanist
+if [ $? -gt 0 ]; then
+    echo "Failed to install arcanist"
+fi
