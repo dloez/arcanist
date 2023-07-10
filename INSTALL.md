@@ -5,13 +5,20 @@ Use one of the following methods
 Supported OS:
 - Linux
 - macOS
+- Windows
 
-Requisites:
+Unix requisites:
 - wget
 
-1. Run `curl https://raw.githubusercontent.com/dloez/arcanist/main/install.sh | sh`.
+Unix:
+1. Open a shell and run `curl https://raw.githubusercontent.com/dloez/arcanist/main/install.sh | sh`.
+2. Restart the shell. The script will also print a source command that you can run to avoid re-opening a shell to force changes.
 
-## Manual install
+Windows:
+1. Open a powershell window and run `$null = Invoke-WebRequest -Uri https://raw.githubusercontent.com/dloez/arcanist/main/install.ps1 -OutFile "install.ps1"; powershell -ExecutionPolicy Bypass -File "./install.ps1"; Remove-Item "install.ps1" -Force`.
+2. Add the printed by the installer path to the PATH system/user environment variable and open a new powershell window.
+
+## Manual installation
 Use this method if your OS is currently not available in the [automatic installation](https://github.com/dloez/arcanist/blob/main/INSTALL.md#automatic-installation).
 
 1. Download your platform binary from the [release page](https://github.com/dloez/arcanist/releases/tag/v0.1.0).
