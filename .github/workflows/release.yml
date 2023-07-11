@@ -13,15 +13,37 @@ jobs:
       - name: Extract version from Cargo.toml
         id: gather-version
         run: echo version=$(cargo metadata --format-version 1 | jq -r '.packages[] | select(.name == "arcanist").version') >> $GITHUB_OUTPUT
-      - name: Ensure release does not already exist
+      - name: Ensure that the project version and the tag match
         run: |
-          git fetch origin &> /dev/null
           version=${{ steps.gather-version.outputs.version }}
-          if [[ -n "$(git tag -l v${version})" ]]; then
-            echo "Project version '${version}' and tag 'v${version}' matches!!"
+          tag=${GITHUB_REF#refs/*/}
+          if [[ "v${version}" == $tag ]]; then
+            echo "Project version '${version}' and tag '${tag}' matches!!"
             exit 0
           else
-            echo "Project version '${version}' and tag 'v${version}' does not match!!"
+            echo "Project version '${version}' and tag '${tag}' does not match!!"
+            exit 1
+          fi
+      - name: Ensure that the project version and the install version in 'install.sh' match
+        run: |
+          version=${{ steps.gather-version.outputs.version }}
+          install_version=$(sed -n 's/VERSION="\([^"]*\)"/\1/p' install.sh)
+          if [[ $version == $install_version ]]; then
+            echo "Project version '${version}' and sh install script version '${install_version}' matches!!"
+            exit 0
+          else
+            echo "Project version '${version}' and sh install script version '${install_version}' does not match!!"
+            exit 1
+          fi
+      - name: Ensure that the project version and the install version in 'install.ps1' match
+        run: |
+          version=${{ steps.gather-version.outputs.version }}
+          install_version=$(sed -n 's/\$VERSION *= *"\([^"]*\)"/\1/p' install.ps1)
+          if [[ $version == $install_version ]]; then
+            echo "Project version '${version}' and powershell install script version '${install_version}' matches!!"
+            exit 0
+          else
+            echo "Project version '${version}' and powershell install script version '${install_version}' does not match!!"
             exit 1
           fi
   build-lint:

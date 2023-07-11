@@ -16,7 +16,7 @@ function Install-Arcanist {
 }
 
 
-$VERSION = "0.1.0"
+$VERSION = "0.2.1"
 $INSTALL_DIR = "${env:localappdata}\arcanist"
 $BINARY_NAME = "arcanist_${VERSION}_x86_64-pc-windows-msvc.exe"
 $DOWNLOAD_URL = "https://github.com/dloez/arcanist/releases/download/v${VERSION}/${BINARY_NAME}"

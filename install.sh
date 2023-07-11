@@ -105,7 +105,7 @@ install_arcanist() {
 }
 
 
-VERSION="0.1.0"
+VERSION="0.2.1"
 GITHUB_REPOSITORY_BASE_URL="https://github.com/dloez"
 GITHUB_RELEASES_BASE_URL="${GITHUB_REPOSITORY_BASE_URL}/arcanist/releases"
 GITHUB_RELEASE_URL="${GITHUB_RELEASES_BASE_URL}/tag/${VERSION}"
