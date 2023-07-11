@@ -19,7 +19,7 @@ def example():
 To call `example` function, run `arcanist example`.
 
 ### Call function with arguments
-You can pass arguments to a function by specifying as much possitional arguments as required after the function name. For example, to call a python function named `example` and pass `1, 2, 3` as the function arguments, run `arcanist example 1 2 3`. All arguments passed will be strings. Full example:
+You can pass arguments to a function by specifying as much positional arguments as required after the function name. For example, to call a python function named `example` and pass `1, 2, 3` as the function arguments, run `arcanist example 1 2 3`. All arguments passed will be strings. Full example:
 
 ```python
 def example(*args):
