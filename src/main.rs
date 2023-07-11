@@ -1,6 +1,6 @@
 use clap::{arg, Command};
 use glob::glob;
-use std::path::PathBuf;
+use std::{env, path::PathBuf};
 use strum::IntoEnumIterator;
 use strum_macros::EnumIter;
 
@@ -80,8 +80,11 @@ fn get_spec_files_paths() -> Vec<wrapper::Wrapper> {
 }
 
 fn main() {
+    let version = env::var("CARGO_PKG_VERSION").expect("Could not get 'CARGO_PKG_VERSION'");
+    let version_static: &'static str = Box::leak(version.into_boxed_str());
+
     let matches = Command::new("Arcanist")
-        .version("0.1")
+        .version(version_static)
         .author("David L. <davidlopez.hellin@outlook.com>")
         .about("A 'Mage' inspired function runner with multi-language support")
         .arg(arg!([function_name] "Function to call").required(true))
