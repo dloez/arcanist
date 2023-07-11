@@ -6,7 +6,7 @@ use std::path::Path;
 
 use regex::Regex;
 
-const REGEX_FUNCTION_PATTERN: &str = r"def[ \t]*{{function_name}}\b.*:";
+const REGEX_FUNCTION_PATTERN: &str = r"[ \n\t]{{function_name}}[ \n\t]*\(.*\)[ \n\t]*\{";
 
 pub fn does_function_exists(spec_file_path: &Path, function_name: &str) -> bool {
     let file_content = fs::read_to_string(spec_file_path)
@@ -20,17 +20,11 @@ pub fn does_function_exists(spec_file_path: &Path, function_name: &str) -> bool 
 pub fn call_function(spec_file_path: &Path, function_name: &str, args: &[&String]) {
     let mut args_string: String = String::new();
     for arg in args {
-        args_string.push_str(&format!("{}, ", arg));
+        args_string.push_str(&format!("{} ", arg));
     }
 
-    let python_code = "\
-        import importlib.util; \
-        spec = importlib.util.spec_from_file_location('main', '{{spec_file_path}}'); \
-        module = importlib.util.module_from_spec(spec); \
-        spec.loader.exec_module(module); \
-        module.{{function_name}}({{args}}) \
-    ";
-    let python_code = python_code
+    let shell_code = ". {{spec_file_path}} && {{function_name}} {{args}}";
+    let shell_code = shell_code
         .replace(
             "{{spec_file_path}}",
             spec_file_path
@@ -40,7 +34,7 @@ pub fn call_function(spec_file_path: &Path, function_name: &str, args: &[&String
         .replace("{{function_name}}", function_name)
         .replace("{{args}}", &args_string);
 
-    let shell_cmd = cmd!("python", "-c", python_code);
+    let shell_cmd = cmd!("sh", "-c", shell_code);
     let reader = shell_cmd
         .stderr_to_stdout()
         .stderr_capture()
