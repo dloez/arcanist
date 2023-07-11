@@ -1,7 +1,11 @@
 use duct::cmd;
 use std::fs;
+use std::fs::File;
+use std::io;
 use std::io::BufRead;
 use std::io::BufReader;
+use std::io::Error;
+use std::io::ErrorKind;
 use std::path::Path;
 
 use regex::Regex;
@@ -23,6 +27,11 @@ pub fn call_function(spec_file_path: &Path, function_name: &str, args: &[&String
         args_string.push_str(&format!("{} ", arg));
     }
 
+    let shell = match get_shebang(spec_file_path) {
+        Ok(shebang) => shebang.replace("#!", ""),
+        Err(_) => String::from("sh"),
+    };
+
     let shell_code = ". {{spec_file_path}} && {{function_name}} {{args}}";
     let shell_code = shell_code
         .replace(
@@ -34,7 +43,7 @@ pub fn call_function(spec_file_path: &Path, function_name: &str, args: &[&String
         .replace("{{function_name}}", function_name)
         .replace("{{args}}", &args_string);
 
-    let shell_cmd = cmd!("sh", "-c", shell_code);
+    let shell_cmd = cmd!(shell, "-c", shell_code);
     let reader = shell_cmd
         .stderr_to_stdout()
         .stderr_capture()
@@ -45,4 +54,21 @@ pub fn call_function(spec_file_path: &Path, function_name: &str, args: &[&String
     for line in lines {
         println!("{}", line.unwrap());
     }
+}
+
+fn get_shebang(spec_file_path: &Path) -> Result<String, io::Error> {
+    let file = File::open(spec_file_path)?;
+    let reader = BufReader::new(file);
+
+    let first_line: String;
+    if let Some(Ok(line)) = reader.lines().next() {
+        first_line = line;
+    } else {
+        return Err(Error::new(ErrorKind::Other, "failed to read first line"));
+    }
+
+    if first_line.starts_with("#!/") {
+        return Ok(first_line);
+    }
+    Err(Error::new(ErrorKind::Other, "shebang not found"))
 }

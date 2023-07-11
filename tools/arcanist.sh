@@ -1,6 +1,12 @@
 #!/bin/bash
 
 release() {
+    command -v jq &> "/dev/null"
+    if [[ $? -gt 0 ]]; then
+        echo "Missing required tool 'jq'"
+        exit
+    fi
+
     project_version=$(cargo metadata --format-version 1 | jq -r '.packages[] | select(.name == "arcanist").version')
     echo "Project version ('Cargo.toml') : ${project_version}"
 
@@ -24,5 +30,8 @@ release() {
 
     git tag -a "v${project_version}" -m "Arcanist version ${project_version}"
     echo "Tag v${project_version} created, pushing tag to origin..."
+
+    echo "Ready to push tag v${project_version}, press any key to continue"
+    read -d'' -s -n1
     git push origin "v${project_version}"
 }
