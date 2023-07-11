@@ -80,11 +80,9 @@ fn get_spec_files_paths() -> Vec<wrapper::Wrapper> {
 }
 
 fn main() {
-    let version = env::var("CARGO_PKG_VERSION").expect("Could not get 'CARGO_PKG_VERSION'");
-    let version_static: &'static str = Box::leak(version.into_boxed_str());
-
+    let version: &'static str = env!("CARGO_PKG_VERSION");
     let matches = Command::new("Arcanist")
-        .version(version_static)
+        .version(version)
         .author("David L. <davidlopez.hellin@outlook.com>")
         .about("A 'Mage' inspired function runner with multi-language support")
         .arg(arg!([function_name] "Function to call").required(true))
