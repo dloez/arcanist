@@ -11,6 +11,7 @@ use wrapper::WrapperActions;
 enum SupportedExtension {
     Yaml,
     Python,
+    Bash,
 }
 
 trait Extension {
@@ -23,6 +24,7 @@ impl Extension for SupportedExtension {
         match self {
             SupportedExtension::Yaml => vec!["yaml", "yml"],
             SupportedExtension::Python => vec!["py"],
+            SupportedExtension::Bash => vec!["sh"],
         }
     }
 
@@ -37,6 +39,13 @@ impl Extension for SupportedExtension {
             }
             SupportedExtension::Python => {
                 let wrapper_kind = wrapper::WrapperKind::Python;
+                wrapper::Wrapper {
+                    spec_file_path,
+                    wrapper_kind,
+                }
+            }
+            SupportedExtension::Bash => {
+                let wrapper_kind = wrapper::WrapperKind::Bash;
                 wrapper::Wrapper {
                     spec_file_path,
                     wrapper_kind,
@@ -76,15 +85,23 @@ fn main() {
         .author("David L. <davidlopez.hellin@outlook.com>")
         .about("A 'Mage' inspired function runner with multi-language support")
         .arg(arg!([function_name] "Function to call").required(true))
+        .arg(
+            arg!([args] "Arguments to pass to the function")
+                .required(false)
+                .num_args(0..)
+                .default_missing_value("")
+                .default_value(""),
+        )
         .get_matches();
 
     let wrappers = get_spec_files_paths();
     let function_name = matches
         .get_one::<String>("function_name")
         .expect("required");
+    let args: Vec<&String> = matches.get_many::<String>("args").unwrap().collect();
     for wrapper in wrappers {
         if wrapper.does_function_exists(function_name) {
-            wrapper.call_function(function_name);
+            wrapper.call_function(function_name, &args);
         };
     }
 }
